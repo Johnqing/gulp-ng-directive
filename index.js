@@ -34,13 +34,7 @@ module.exports = function (options) {
 			return
 		}
 
-		fs.writeFileSync(options.outfile, JSON.stringify(elements), function(err){
-			if(err){
-				throw new Error(err);
-			}
-		});
-
-
+		fs.writeFileSync(options.outfile, JSON.stringify(elements));
 		this.push(file);
 		cb();
 	});
