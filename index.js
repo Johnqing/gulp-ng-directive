@@ -18,8 +18,9 @@ module.exports = function (options) {
 		    this.emit('error', new gutil.PluginError('gulp-ng-directive', 'Streaming not supported'));
 		    return cb();
 	    }
+		var filePath = file.path;
 
-		var directives = ngDirectiveParser.parseFile(file);
+		var directives = ngDirectiveParser.parseFile(filePath);
 		var elements = ['ng-include', 'ng-pluralize', 'ng-view', 'ng:include', 'ng:pluralize', 'ng:view'];
 
 		directives.forEach(function(d){
