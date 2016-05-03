@@ -7,7 +7,7 @@ var File = gutil.File;
 var ngDirectiveParser = require('ng-directive-parser');
 
 module.exports = function (options) {
-
+	var elements = [];
 	return through.obj(function (file, enc, cb){
 		if (file.isNull()) {
 			this.push(file);
@@ -21,11 +21,10 @@ module.exports = function (options) {
 		var filePath = file.path;
 
 		var directives = ngDirectiveParser.parseFile(filePath);
-		var elements = '';
 
 		directives.forEach(function(d){
 			if(d && d.restrict.E){
-				elements += d.name.replace(/([A-Z])/g, '-$1').toLowerCase() + ',';
+				elements.push(d.name.replace(/([A-Z])/g, '-$1').toLowerCase());
 			}
 		});
 
@@ -34,15 +33,11 @@ module.exports = function (options) {
 			cb();
 			return
 		}
-		fs.open(options.outfile, 'a', function(err, fd) {
+
+		fs.writeFile(options.outfile, JSON.stringify(elements), function(err){
 			if(err){
 				throw new Error(err);
 			}
-			fs.write(fd, elements, function(err){
-				if(err){
-					throw new Error(err);
-				}
-			});
 		});
 
 
