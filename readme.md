@@ -17,3 +17,7 @@ gulp.task("", function(callback) {
     .pipe(gulp.dest('build'))
 });
 ```
+
+## prompt：
+
+Before each run, ensure that the output file is empty

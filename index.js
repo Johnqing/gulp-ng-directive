@@ -8,24 +8,24 @@ var ngDirectiveParser = require('ng-directive-parser');
 
 module.exports = function (options) {
 
-    return through.obj(function (file, enc, cb){
-	    if (file.isNull()) {
-		    this.push(file);
-		    return cb();
-	    }
+	return through.obj(function (file, enc, cb){
+		if (file.isNull()) {
+			this.push(file);
+			return cb();
+		}
 
-	    if (file.isStream()) {
-		    this.emit('error', new gutil.PluginError('gulp-ng-directive', 'Streaming not supported'));
-		    return cb();
-	    }
+		if (file.isStream()) {
+			this.emit('error', new gutil.PluginError('gulp-ng-directive', 'Streaming not supported'));
+			return cb();
+		}
 		var filePath = file.path;
 
 		var directives = ngDirectiveParser.parseFile(filePath);
-		var elements = ['ng-include', 'ng-pluralize', 'ng-view', 'ng:include', 'ng:pluralize', 'ng:view'];
+		var elements = '';
 
 		directives.forEach(function(d){
 			if(d && d.restrict.E){
-				elements.push(d.name.replace(/([A-Z])/g, '-$1').toLowerCase());
+				elements += d.name.replace(/([A-Z])/g, '-$1').toLowerCase() + ',';
 			}
 		});
 
@@ -34,15 +34,20 @@ module.exports = function (options) {
 			cb();
 			return
 		}
-
-		fs.writeFile(options.outfile, JSON.stringify(elements), function(err){
+		fs.open(options.outfile, 'a', function(err, fd) {
 			if(err){
 				throw new Error(err);
 			}
+			fs.write(fd, elements, function(err){
+				if(err){
+					throw new Error(err);
+				}
+			});
 		});
 
-	    this.push(file);
-	    cb();
-    });
+
+		this.push(file);
+		cb();
+	});
 
 };
